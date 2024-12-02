@@ -16,23 +16,11 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 plt.style.use('dark_background')
 plt.rcParams.update({'font.size': 8})
-
 import glasbey
 
 # Data related imports
 import scanpy as sc
-import spatialdata as sd
-
-# Load general data
-leiden_resolutions = {'leiden_0.1': 0.1, 'leiden_0.2': 0.2, 'leiden_0.5': 0.5, 'leiden_1.0': 1.0, 'leiden_1.5': 1.5}
-data_dir = 'data'
-
-genes = np.load(os.path.join(data_dir, 'genes.npy'), allow_pickle = True).tolist()
-genes_label = [x.split('-')[1] for x in genes]
-
-with open(os.path.join(data_dir, 'data.txt'), 'r') as f:
-    data = f.readlines()
-data = [x.rstrip('\n') for x in data]
+from spaceolotl._constants import *
 
 # General page setup
 app_ui = ui.page_navbar(  
@@ -49,15 +37,15 @@ app_ui = ui.page_navbar(
         # Sidebar
         ui.page_sidebar(
             ui.sidebar(
-                ui.input_selectize("select_dataset", "Select dataset", ['', *data], selected = None),
-                ui.input_selectize("select_resolution", "Cluster resolution", leiden_resolutions),
+                ui.input_selectize("select_dataset", "Select dataset", ['', *DATA], selected = None),
+                ui.input_selectize("select_resolution", "Cluster resolution", LEIDEN_RESOLUTIONS),
                 ui.input_switch("switch_outlines", "Show cell outlines", False),
                 ui.input_switch("switch_clusters", "Show clusters", True),
-                ui.input_selectize("select_gene", "Select gene", ['', *genes], selected = None),
+                ui.input_selectize("select_gene", "Select gene", ['', *GENES], selected = None),
                 ui.input_switch("switch_expression", "Plot gene expression", False),
                 ui.input_slider("slider_dotsize_umap", "Slider UMAP", 1, 20, 2),
                 ui.input_slider("slider_dotsize_space", "Slider Space", 1, 20, 2),
-                ui.input_selectize("select_gene_expression", "Select genes", ['', *genes], selected = None, multiple = True),
+                ui.input_selectize("select_gene_expression", "Select genes", ['', *GENES], selected = None, multiple = True),
                 ui.input_slider("slider_n_genes", "Slider nGenes", 1, 10, 3),
                 ui.input_slider("slider_lfc", "Slider minLFC", 0.5, 2.5, 0.5, step = 0.1),
 
@@ -105,8 +93,8 @@ def server(input, output, session):
             return None
         
         try:
-            adata = sc.read_h5ad(os.path.join(data_dir, name + '.h5ad'))
-            with open(os.path.join(data_dir, name + '_traces.json'), 'r') as f:
+            adata = sc.read_h5ad(os.path.join(DATA_DIR, name + '.h5ad'))
+            with open(os.path.join(DATA_DIR, name + '_traces.json'), 'r') as f:
                 traces = json.load(f)
             return {'a': adata, 't': traces}
         
@@ -181,7 +169,7 @@ def server(input, output, session):
 
         adata = spatial_data['a']
         p = plot_umap.widget
-        p.data = [trace for trace in p.data if trace.name not in genes_label]
+        p.data = [trace for trace in p.data if trace.name not in GENES_LABEL]
 
         if input.switch_expression() and input.select_gene():
 
@@ -287,7 +275,7 @@ def server(input, output, session):
             return
 
         p = plot.widget
-        p.data = [trace for trace in p.data if trace.name not in genes_label]
+        p.data = [trace for trace in p.data if trace.name not in GENES_LABEL]
 
         if input.switch_expression() and input.select_gene():
 

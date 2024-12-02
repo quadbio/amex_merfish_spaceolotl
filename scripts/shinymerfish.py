@@ -15,6 +15,22 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 # Project specific classes
 class ShinyMerfish:
+    """
+    A class to prepare data for import into shiny app.
+
+    Attributes:
+        sample (str): The sample identifier.
+        sdata (SpatialData): The spatial data read from the input path.
+        angle (float): The rotation angle for the sample.
+        label (str): The label for the sample.
+        resolution_keys (list): The keys for different clustering resolutions.
+        gdf (GeoDataFrame): The processed GeoDataFrame with clustering information.
+
+    Methods:
+        _set_resolution_keys(kwargs): Sets the resolution keys for clustering.
+        _process_gdf(): Processes and rotates the GeoDataFrame.
+        _generate_traces(): Generates traces for visualization.
+    """
     
     def __init__(self, sample, input_path, output_path, metadata, **kwargs):
 
