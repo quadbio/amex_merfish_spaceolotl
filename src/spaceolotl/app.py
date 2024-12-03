@@ -47,7 +47,7 @@ app_ui = ui.page_navbar(
                 ui.input_slider("slider_dotsize_space", "Slider Space", 1, 20, 2),
                 ui.input_selectize("select_gene_expression", "Select genes", ['', *GENES], selected = None, multiple = True),
                 ui.input_slider("slider_n_genes", "Slider nGenes", 1, 10, 3),
-                ui.input_slider("slider_lfc", "Slider minLFC", 0.5, 2.5, 0.5, step = 0.1),
+                ui.input_slider("slider_lfc", "Slider minLFC", 0.5, 2.5, 0.5, step = 0.1)
 
             ),
             ui.layout_columns(
@@ -209,8 +209,19 @@ def server(input, output, session):
             template="plotly_dark",
             showlegend=True,
             autosize=True,
-            yaxis_scaleanchor="x"
+            yaxis_scaleanchor="x",
+            xaxis=dict(title="[mm]"),
+            yaxis=dict(title="[mm]")
         )
+        fig.update_xaxes(
+            tickvals=[-1000, 0, 1000],
+            ticktext=[-1, 0, 1]
+        )
+        fig.update_yaxes(
+            tickvals=[-1000, 0, 1000],
+            ticktext=[-1, 0, 1]
+        )
+
 
         return fig
 
@@ -343,7 +354,7 @@ def server(input, output, session):
         plot_de = sc.pl.rank_genes_groups_dotplot(
             spatial_data['a'],
             n_genes = input.slider_n_genes(),
-            key = input.select_resolution(),
+            key = 'rank_' + input.select_resolution(),
             min_logfoldchange=input.slider_lfc(),
             return_fig = True)
 

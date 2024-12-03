@@ -17,20 +17,22 @@ samples = ANNO_BASE.index
 
 # Project specific functions
 def process_sample(sample):
-
-    ShinyMerfish(
-        sample,
-        IN_DIR,
-        OUT_DIR,
-        ANNO_BASE,
-        normalize_to=800,
-        regress_out=['nCount_RNA'],
-        resolutions=[0.1, 0.2, 0.5, 1.0, 1.5],
-        n_umap=3,
-        basis='X_pca',
-        obs_keys=['nCount_RNA'],
-        verbose = False
-    )
+    try:
+        ShinyMerfish(
+            sample,
+            IN_DIR,
+            OUT_DIR,
+            ANNO_BASE,
+            normalize_to=800,
+            regress_out=['nCount_RNA'],
+            resolutions=[0.1, 0.2, 0.5, 1.0, 1.5],
+            n_umap=3,
+            basis='X_pca',
+            obs_keys=['nCount_RNA'],
+            verbose = False
+        )
+    except Exception as e:
+        logger.error(f"Error processing sample {sample}: {e}")
 
 if __name__ == '__main__':
 

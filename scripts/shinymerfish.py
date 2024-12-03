@@ -2,6 +2,9 @@
 import os
 import json
 import numpy as np
+import geopandas as gpd
+import scanpy as sc
+import inspect
 import spatialdata as sd
 
 # Project specific imports
@@ -47,6 +50,9 @@ class ShinyMerfish:
         self._process_gdf()
         self._generate_traces()
 
+        # Differential expression analysis
+        self._differential_expression(self.resolution_keys)
+
         # Create output
         self._export(output_path)
 
@@ -55,6 +61,23 @@ class ShinyMerfish:
     
         resolutions = kwargs.get('resolutions') or inspect.signature(scwf).parameters['resolutions'].default
         self.resolution_keys = [f'leiden_{res}' for res in resolutions]
+
+    def _get_centroid(self, gdf: gpd.GeoDataFrame, column: str, axis: str) -> pd.Series:
+        """
+        Get the centroid of a GeoDataFrame column.
+
+        Parameters:
+            gdf (GeoDataFrame): The GeoDataFrame containing the geometries.
+            column (str): The column name containing the geometries.
+            axis (str): The axis for which to get the centroid ('x' or 'y').
+
+        Returns:
+            Series: The centroid coordinates for the specified axis.
+        """
+        if axis == 'x':
+            return gdf[column].apply(lambda row : row.centroid.x)
+        elif axis == 'y':
+            return gdf[column].apply(lambda row : row.centroid.y)
 
     def _process_gdf(self) -> None:
         """Process and rotate the gdf, adding clustering information from adata."""
@@ -65,18 +88,18 @@ class ShinyMerfish:
             table_name = "table"
         )[0]["cell_boundaries"]
 
-        self.gdf['x_center'] = self.gdf['geometry'].apply(lambda row : row.centroid.x)
-        self.gdf['y_center'] = self.gdf['geometry'].apply(lambda row : row.centroid.y)
-
-        shift_x = -round(np.mean(self.gdf['x_center']))
-        shift_y = -round(np.mean(self.gdf['y_center']))
-
-        self.gdf['geometry'] = self.gdf['geometry'].translate(xoff = shift_x, yoff = shift_y)
+        # Rotate and translate the gdf
+        self.gdf['geometry'] = self.gdf['geometry'].translate(
+            xoff = -round(self._get_centroid(self.gdf, 'geometry', 'x').mean()),
+            yoff = -round(self._get_centroid(self.gdf, 'geometry', 'y').mean())
+            )
         self.gdf['geometry'] = self.gdf['geometry'].rotate(self.angle, origin=(0, 0))
 
-        self.sdata['table'].obs['x'] = self.gdf['x_center']
-        self.sdata['table'].obs['y'] = self.gdf['y_center']
+        # Match the centroid of the gdf to the table
+        self.sdata['table'].obs['x'] = self._get_centroid(self.gdf, 'geometry', 'x')
+        self.sdata['table'].obs['y'] = self._get_centroid(self.gdf, 'geometry', 'y')
         
+        # Add clustering columns to the gdf
         clustering_columns = self.sdata['table'].obs[self.resolution_keys]
         self.gdf = self.gdf.join(clustering_columns)
 
@@ -100,7 +123,14 @@ class ShinyMerfish:
 
         self.traces = traces
 
-    def _export(self, output_path) -> None:
+    def _differential_expression(self, resolutions: list) -> None:
+        """Perform differential expression analysis for each resolution key."""
+
+        for resolution in resolutions:
+            sc.tl.rank_genes_groups(self.sdata['table'], groupby=resolution, key_added= 'rank_' + resolution)
+
+    def _export(self, output_path: str) -> None:
+        """Export the processed data to the output path."""
 
         with open(os.path.join(output_path, self.sample + '_traces.json'), 'w') as f:
             json.dump(self.traces, f)
