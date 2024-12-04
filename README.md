@@ -6,7 +6,7 @@
 **b. On a local machine (MacOS):** Open a terminal (e.g by typing "terminal" in SpotlightSearch)\
 **c. On a local machine (Windows):** Press `Windows key` + `X`, select Windows Terminal
 
-Navigate to a suitable location (a directory called amex_merfish_spaceolotl will be placed in there), run the following commands:
+Navigate to a suitable location (a directory called amex_merfish_spaceolotl will be placed in there) and run the following commands:
 ```
 # Create a new conda environment:
 mamba create -n spaceolotl python=3.12
@@ -46,8 +46,10 @@ Upon login to the server, you should find the tarball in amex_merfish_spaceolotl
 tar -xzvf data.tar.gz && rm data.tar.gz
 ```
 **b. On a local machine (MacOS):**
-Drag and drop the tarball you downloaded from 
+Drag and drop the tarball you downloaded from Polybox to the amex_merfish_spaceolotl directory. Double click on the tarball to decompress the object, this will create an ordinary folder called "data". After this process has finished, you can delete the `data.tar.gz`.
 
+**c. On a local machine (Windows):** Will be added soon
+ 
 ## Running the app
 **a. On a remote server:**\
 Connect to the remote server while forwarding a port:
@@ -68,3 +70,25 @@ shiny run --port 7600 src/spaceolotl/app.py
 ```
 
 You can now access the app in your local browser by typing in `localhost:12345` in the search bar.
+
+**b. On a local machine (MacOS):**
+Open a terminal like before and execute the following commands
+```
+# Move to the amex_merfish_spaceolotl directory
+cd path/to/amex_merfish_spaceolotl
+
+# Activate the Python environment
+mamba activate spaceolotl
+
+# Run the app
+shiny run src/spaceolotl/app.py
+```
+You can now access the app through the search bar in your local browser by typing `localhost:8000`.
+Note: There might be cases where the standard port is blocked and Shiny selects a different one. In this case you won't be able to access the app as described above. Check the commandline upon startup and search for a message like
+```
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+```
+Copy the part `http://127.0.0.1:8000` into the search bar or your browser. This should lead you to the app.
+
+**c. On a local machine (Windows):**
+Will be added soon
