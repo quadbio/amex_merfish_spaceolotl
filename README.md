@@ -1,5 +1,5 @@
 ## Requirements
-- A python installation and a package manager such as conda or mamba.
+- A python package manager such as conda or mamba. Installing mamba is recommended as it is lightweight and fast. More information can be found [here](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html) and [here](https://github.com/conda-forge/miniforge).
 
 ## Install instructions
 **a. On a remote server:**\
@@ -24,8 +24,11 @@ pip install -e .
 mkdir data
 ```
 The package is now installed and the app can be launched, but the data directory is currently empty.
-In order to fetch the data (provided as a tarball ending with tar.gz), download to you local machine it from Polybox via the link shared on Slack.
-Transfer the data using your favourite File Transfer Protocol client program (e.g. FileZilla) or simply through the command line:
+In order to fetch the data (provided as a tarball ending with tar.gz), download it to you local machine from Polybox via the link shared on Slack.
+Transfer the data using your favourite File Transfer Protocol client program (e.g. FileZilla) or simply through the command line (from your local machine) as shown below.\
+\
+Note: the path to the data directory on the server should be provided as an absolute link (starting with a /). If you don't know the path, enter the data directory
+and type in `echo $PWD`. This will print the absolute path to the directory.
 
 ```
 # This command transfers the tarball to the data directory. You might be asked to authenicate yourself
@@ -35,7 +38,7 @@ scp /path/to/tarball/on/local/machine username@domain:/path/to/amex_merfish_spac
 Upon login to the server, you should find the tarball in amex_merfish_spaceolotl/data. We can now remove unpack the data into the data directory and remove the tarball as it is no longer needed
 ```
 # Unpack the data and clean up
-tar -xzvf archive.tar.gz && rm archive.tar.gz
+tar -xzvf data.tar.gz && rm data.tar.gz
 ```
 
 Congratulations! Everything is set up to run the app.
