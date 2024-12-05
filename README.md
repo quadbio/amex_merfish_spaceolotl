@@ -1,4 +1,4 @@
-[![pytest](https://github.com/quadbio/amex_merfish/actions/workflows/pytest.yml/badge.svg)](https://github.com/quadbio/amex_merfish/actions/workflows/pytest.yml)
+[![pytest](https://github.com/quadbio/amex_merfish_spaceolotl/actions/workflows/install.yml/badge.svg)](https://github.com/quadbio/amex_merfish_spaceolotl/actions/workflows/install.yml)
 ![Python 3.12](https://img.shields.io/badge/python-3.12-blue)
 
 ## Requirements
