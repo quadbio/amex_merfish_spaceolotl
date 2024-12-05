@@ -3,17 +3,12 @@ from shinywidgets import output_widget
 
 from spaceolotl._constants import DATA, GENES, LEIDEN_RESOLUTIONS
 from spaceolotl.js._format import DROPDOWN_CONFIG
+from spaceolotl import __version__
 
 app_ui = ui.page_navbar(  
 
-    # RNA
-    ui.nav_panel("RNA", "Page A content"),
-
-    # ATAC
-    ui.nav_panel("ATAC", "Page B content"),
-
     # MERFISH
-    ui.nav_panel("MERFISH",
+    ui.nav_panel(ui.HTML("MERFISH<br><span style='font-size: smaller;'>data v1.0.2</span>"),
         
         # Sidebar
         ui.page_sidebar(
@@ -77,8 +72,14 @@ app_ui = ui.page_navbar(
                 col_widths={"sm": (5, 7, 12)}
                 )
                 
-            ),
+            )
     ),
+
+    # RNA
+    ui.nav_panel(ui.HTML("RNA<br><span style='font-size: smaller;'>coming soon</span>")),
+
+    # ATAC
+    ui.nav_panel(ui.HTML("ATAC<br><span style='font-size: smaller;'>coming soon</span>")),
 
         # Main content
 
@@ -88,7 +89,7 @@ app_ui = ui.page_navbar(
     ui.nav_spacer(),
     ui.nav_control(ui.input_dark_mode(id="mode", mode = 'dark')),
 
-    title="A Cell Atlas of the Axolotl Brain",  
+    title=ui.HTML(f"A Cell Atlas of the Axolotl Brain<br><span style='font-size: 12px; display: block; '>app v{__version__}</span>"),
     id="page"
     
 )  
