@@ -25,4 +25,4 @@ jobs:
 
       - name: Verify installation
         run: |
-          python -c "import amex_merfish_spaceolotl"
+          python -c "import spaceolotl"
