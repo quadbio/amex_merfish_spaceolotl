@@ -1,3 +1,4 @@
+from shiny import ui
 from spaceolotl.fct.load import get_data
 from spaceolotl._constants import GENES_LABEL
 
@@ -7,9 +8,7 @@ import glasbey
 
 def plot_umap(input):
 
-    spatial_data = get_data(input)
-
-    if spatial_data is None:
+    if not get_data(input):
         return None
 
     fig = go.Figure()
@@ -18,25 +17,25 @@ def plot_umap(input):
         showlegend=False,
         autosize=True,
         scene=dict(
-    xaxis=dict(showgrid=False, showticklabels=False, title='', zeroline=False),
-    yaxis=dict(showgrid=False, showticklabels=False, title='', zeroline=False),
-    zaxis=dict(showgrid=False, showticklabels=False, title='', zeroline=False))
+            xaxis=dict(showgrid=False, showticklabels=False, title='', zeroline=False),
+            yaxis=dict(showgrid=False, showticklabels=False, title='', zeroline=False),
+            zaxis=dict(showgrid=False, showticklabels=False, title='', zeroline=False))
     )
 
     return fig
 
 def add_umap_clusters(input, widget):
-    spatial_data = get_data(input)
+    
+    if not (adata := get_data(input)):
+        return None
+    
+    if not input.select_resolution():
+        return None
 
-    if spatial_data is None:
-        return
-
-    p = widget
-    p.data = [trace for trace in p.data if not trace.name.isdigit()]
+    widget.data = [trace for trace in widget.data if not trace.name.isdigit()]
 
     if input.switch_clusters():
         
-        adata = spatial_data['a']
         cluster_ids = np.unique(adata.obs[input.select_resolution()])
         colors = glasbey.create_palette(palette_size=len(cluster_ids), lightness_bounds=(50, 100))
 
@@ -46,7 +45,7 @@ def add_umap_clusters(input, widget):
             y_coords = adata.obsm['X_umap'][adata.obs[input.select_resolution()] == cluster_id, 1]
             z_coords = adata.obsm['X_umap'][adata.obs[input.select_resolution()] == cluster_id, 2]
 
-            p.add_trace(
+            widget.add_trace(
                 go.Scatter3d(
                 name = cluster_id,
                 x = x_coords,
@@ -61,24 +60,21 @@ def add_umap_clusters(input, widget):
             )
 
 def add_umap_expression(input, widget):
-    spatial_data = get_data(input)
 
-    if spatial_data is None:
-        return
+    if not (adata := get_data(input)):
+        return None
 
-    adata = spatial_data['a']
-    p = widget
-    p.data = [trace for trace in p.data if trace.name not in GENES_LABEL]
+    widget.data = [trace for trace in widget.data if trace.name not in GENES_LABEL]
 
     if input.switch_expression() and input.select_gene():
 
         gene_name = input.select_gene().split('-')[1]
         gene_expression = np.array(adata[:,input.select_gene()].X.flatten())
-        x_coords = adata.obsm['X_umap'][:,0]
-        y_coords = adata.obsm['X_umap'][:,1]
-        z_coords = adata.obsm['X_umap'][:,2]
+        x_coords = adata.obsm['X_umap'][:, 0]
+        y_coords = adata.obsm['X_umap'][:, 1]
+        z_coords = adata.obsm['X_umap'][:, 2]
         
-        p.add_trace(
+        widget.add_trace(
             go.Scatter3d(
                 name = gene_name,
                 x = x_coords,
@@ -88,9 +84,15 @@ def add_umap_expression(input, widget):
                 marker=dict(
                     color = gene_expression,
                     colorscale = 'Viridis',
-                    size = input.slider_dotsize_umap()
-                ),
-                
-
+                    showscale = True,
+                    size = input.slider_dotsize_umap(),
+                    colorbar=dict(
+                        orientation = 'h',
+                        lenmode='fraction',
+                        len=0.25,
+                        thickness=10,
+                        y = 0.05,
+                        x = 0.15)
+                )
             )
         )

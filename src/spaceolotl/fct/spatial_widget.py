@@ -7,11 +7,10 @@ from spaceolotl._constants import GENES_LABEL
 
 def plot_space(input):
 
-    if not (spatial_data := get_data(input)):
+    if not get_data(input):
         return None
 
     fig = go.Figure()
-
     fig.update_layout(
         template="plotly_dark",
         showlegend=True,
@@ -20,12 +19,10 @@ def plot_space(input):
         xaxis=dict(title="[mm]"),
         yaxis=dict(title="[mm]")
     )
-    
     fig.update_xaxes(
         tickvals=[-1000, 0, 1000],
         ticktext=[-1, 0, 1]
     )
-    
     fig.update_yaxes(
         tickvals=[-1000, 0, 1000],
         ticktext=[-1, 0, 1]
@@ -35,19 +32,21 @@ def plot_space(input):
 
 def add_space_clusters(input, widget):
 
-    if not (spatial_data := get_data(input)):
+    if not (adata := get_data(input)):
+        return None
+    
+    if not input.select_resolution():
         return None
 
-    p = widget
-    p.data = [trace for trace in p.data if not trace.name.isdigit()]
+    widget.data = [trace for trace in widget.data if not trace.name.isdigit()]
 
     if input.switch_clusters():
 
-        cluster_traces = spatial_data['t'].get(input.select_resolution(), {})
+        cluster_traces = adata.uns['traces'].get(input.select_resolution(), {})
         colors = glasbey.create_palette(palette_size=len(cluster_traces), lightness_bounds=(50, 100))
 
         for color, (cluster_id, cluster_trace) in zip(colors, cluster_traces.items()):
-            p.add_trace(
+            widget.add_trace(
                 go.Scatter(
                     x=cluster_trace['x'],
                     y=cluster_trace['y'],
@@ -61,7 +60,9 @@ def add_space_clusters(input, widget):
 
 def add_space_outlines(input, widget):
 
-    if not (spatial_data := get_data(input)):
+    adata = get_data(input)
+
+    if adata is None:
         return None
 
     p = widget
@@ -69,7 +70,7 @@ def add_space_outlines(input, widget):
     
     if input.switch_outlines():
         
-        cell_traces = spatial_data['t']['cells']
+        cell_traces = adata.uns['traces']['cells']
         p.add_trace(
             go.Scatter(
                 name='cells',
@@ -82,20 +83,19 @@ def add_space_outlines(input, widget):
 
 def add_space_expression(input, widget):
 
-    if not (spatial_data := get_data(input)):
+    if not (adata := get_data(input)):
         return None
 
-    p = widget
-    p.data = [trace for trace in p.data if trace.name not in GENES_LABEL]
+    widget.data = [trace for trace in widget.data if trace.name not in GENES_LABEL]
 
     if input.switch_expression() and input.select_gene():
 
         gene_name = input.select_gene().split('-')[1]
-        gene_expression = np.array(spatial_data['a'][:,input.select_gene()].X.flatten())
-        x_coords = spatial_data['a'].obs['x']
-        y_coords = spatial_data['a'].obs['y']
+        gene_expression = np.array(adata[:,input.select_gene()].X.flatten())
+        x_coords = adata.obs['x']
+        y_coords = adata.obs['y']
         
-        p.add_trace(
+        widget.add_trace(
             go.Scatter(
                 name = gene_name,
                 x = x_coords,

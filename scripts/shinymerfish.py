@@ -110,7 +110,7 @@ class ShinyMerfish:
         for resolution in self.resolution_keys:
             cluster_dict = {}
             for cluster_id in np.unique(self.gdf[resolution]):
-                cluster = self.gdf.loc[self.gdf[resolution] == cluster_id, 'geometry']
+                cluster = self.gdf.loc[self.gdf[resolution] == cluster_id, 'geometry'].copy()
                 cluster = cluster.geometry.buffer(3).union_all().buffer(-3)
 
                 x_coords, y_coords = extract_polygon_coords(cluster)
@@ -122,6 +122,7 @@ class ShinyMerfish:
         traces['cells'] = {'x': cells_x_coords, 'y': cells_y_coords}
 
         self.traces = traces
+        self.sdata['table'].uns['traces'] = self.traces
 
     def _differential_expression(self, resolutions: list) -> None:
         """Perform differential expression analysis for each resolution key."""
@@ -131,8 +132,5 @@ class ShinyMerfish:
 
     def _export(self, output_path: str) -> None:
         """Export the processed data to the output path."""
-
-        with open(os.path.join(output_path, self.sample + '_traces.json'), 'w') as f:
-            json.dump(self.traces, f)
             
         self.sdata['table'].write_h5ad(os.path.join(output_path, self.sample + '.h5ad'))

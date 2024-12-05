@@ -4,13 +4,13 @@ import scanpy as sc
 
 def plot_gene_expression(input):  
 
-    spatial_data = get_data(input)
+    adata = get_data(input)
     plot_genes = list(input.select_gene_expression())
 
-    if spatial_data is None or not plot_genes:
+    if adata is None or not plot_genes:
         return
 
-    plot_ex = sc.pl.dotplot(spatial_data['a'],
+    plot_ex = sc.pl.dotplot(adata,
                             var_names = plot_genes,
                             swap_axes = True,
                             groupby = input.select_resolution(),
@@ -26,13 +26,11 @@ def plot_gene_expression(input):
 
 def plot_de(input):  
 
-    spatial_data = get_data(input)
-
-    if spatial_data is None:
-        return
+    if not (adata := get_data(input)):
+        return None
     
     plot_de = sc.pl.rank_genes_groups_dotplot(
-        spatial_data['a'],
+        adata,
         n_genes = input.slider_n_genes(),
         key = 'rank_' + input.select_resolution(),
         min_logfoldchange=input.slider_lfc(),
