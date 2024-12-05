@@ -81,10 +81,6 @@ app_ui = ui.page_navbar(
     # ATAC
     ui.nav_panel(ui.HTML("ATAC<br><span style='font-size: smaller;'>coming soon</span>")),
 
-        # Main content
-
-        
-
     # Other components of the header        
     ui.nav_spacer(),
     ui.nav_control(ui.input_dark_mode(id="mode", mode = 'dark')),
