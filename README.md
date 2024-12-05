@@ -1,3 +1,6 @@
+[![pytest](https://github.com/quadbio/amex_merfish/actions/workflows/pytest.yml/badge.svg)](https://github.com/quadbio/amex_merfish/actions/workflows/pytest.yml)
+![Python 3.12](https://img.shields.io/badge/python-3.12-blue)
+
 ## Requirements
 - A python package manager such as conda or mamba. Installing mamba is recommended as it is lightweight and fast. More information can be found [here](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html) and [here](https://github.com/conda-forge/miniforge). Verify by typing `conda` or `mamba` in the terminal. Help messages should appear.
 
