@@ -23,7 +23,6 @@ def plot_gene_expression(input):
     main_ax_ex.set_yticklabels(short_labels_ex)
 
     plt.subplots_adjust(top=0.95, bottom=0.1, left=0.1, right=0.95)
-    plt.show()
 
 def plot_de(input):  
 
@@ -45,4 +44,3 @@ def plot_de(input):
     main_ax_de.set_xticklabels(short_labels_de)
     
     plt.subplots_adjust(top=1, bottom=0.2, left=0.05, right=0.95)
-    plt.show()
