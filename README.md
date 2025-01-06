@@ -48,9 +48,14 @@ Note: the path to the data directory on the server should be provided as an abso
 
 Upon login to the server, you should find the tarball in amex_merfish_spaceolotl/data. We can now remove unpack the data into the data directory and remove the tarball as it is no longer needed
 ```
-# Unpack the data and clean up
+# Unpack the data (in the data directory) and clean up
 tar -xzvf data.tar.gz && rm data.tar.gz
+
+# Note: Sometimes, the .gz extension is being removed when downloading the data from polybox.
+# If this is the case, instead use the following command on the remote server to unpack the data:
+tar -xvf data.tar && rm data.tar
 ```
+
 **b. On a local machine (MacOS):**
 Drag and drop the tarball you downloaded from Polybox to the amex_merfish_spaceolotl directory. Double click on the tarball to decompress the object, this will create an ordinary folder called "data". After this process has finished, you can delete the `data.tar.gz`.
 
